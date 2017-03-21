@@ -15,8 +15,8 @@ app.get('/', (req, res) => {
 })
 
 app.put("/api/foods/edit/:name", (req, res) => {
-  const name = req.params.name
   const food = req.body.food
+  const name = req.params.name
   if (!food){
     return res.status(404).send({
       error: "Missing food attributes"
@@ -28,8 +28,9 @@ app.put("/api/foods/edit/:name", (req, res) => {
       foodList[i] = food;
     }
   }
-
-
+  res.status(201).json({
+    food
+  })
 })
 
 app.post('/api/foods', (req, res) => {

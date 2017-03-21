@@ -53,19 +53,19 @@ describe('Server', () => {
     it("returns a 404 given invalid attributes", (done) => {
       this.request.put("/api/foods/edit/:name", (err, res) => {
         if(err){done(err)}
-          assert.equal(res.statusCode, 404)
+        assert.equal(res.statusCode, 404)
         done()
       })
     })
-    
+
     it("updates a specific foods attributes", (done) => {
       const food = {food: {name: 'pineapple', calories: '300'}}
-      this.request.put("/api/foods/edit/Drew",{ form: food}, (err, res) => {
+      this.request.put("/api/foods/edit/Drew", { form: food}, (err, res) => {
         if(err){done(err)}
         const foodList = app.locals.foodList
         assert.equal(foodList.length, 1)
-        assert.include(foodList, "pineapple") 
-        assert.include(foodList, "300") 
+        assert.equal(foodList[0].name, "pineapple")
+        assert.equal(foodList[0].calories, "300")
         done()
       })
     })
