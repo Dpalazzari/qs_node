@@ -70,4 +70,20 @@ describe('Server', () => {
       })
     })
   })
+
+  describe("DELETE /api/foods/:name", () => {
+    beforeEach(() => {
+      app.locals.foodList = [{name: "David", calories: "300"}]
+    })
+    it ("removes a given food", (done) => {
+      var foodList = app.locals.foodList
+      assert.equal(foodList.length, 1)
+      this.request.delete("/api/foods/David", (err, res) => {
+        if(err){done(err)}
+        foodList = app.locals.foodList
+        assert.equal(foodList.length, 0)
+        done()
+      })
+    })
+  })
 })
