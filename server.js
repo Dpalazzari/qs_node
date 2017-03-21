@@ -15,21 +15,26 @@ app.get('/', (req, res) => {
 })
 
 app.put("/api/foods/edit/:name", (req, res) => {
-  const name = req.params.name
   const food = req.body.food
+  const name = req.params.name
   if (!food){
     return res.status(404).send({
       error: "Missing food attributes"
     })
   }
   const foodList = app.locals.foodList
+  console.log(food)
+  console.log(name)
+  console.log(foodList)
+  console.log(foodList.length)
   for(var i = 0; i < foodList.length ; i++){
     if(foodList[i].name === name){
       foodList[i] = food;
     }
   }
-
-
+  res.status(201).json({
+    food
+  })
 })
 
 app.post('/api/foods', (req, res) => {
