@@ -14,6 +14,22 @@ app.get('/', (req, res) => {
   res.send(app.locals.title)
 })
 
+app.delete("/api/foods/:name", (req, res) => {
+  const name = req.params.name
+  if (!name){
+    return res.status(503).send({
+      error: "Missing name of food to delete"
+    })
+  }
+  const foodList = app.locals.foodList
+  for(var i = 0; i < foodList.length; i++){
+    if(foodList[i].name === name){foodList.splice(i, 1)}
+  }
+  res.status(201).json({
+    message: "Successfully deleted!"
+  })
+}) 
+
 app.put("/api/foods/edit/:name", (req, res) => {
   const food = req.body.food
   const name = req.params.name
