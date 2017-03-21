@@ -53,7 +53,7 @@ describe('Server', () => {
     it("returns a 404 given invalid attributes", (done) => {
       this.request.put("/api/foods/edit/:name", (err, res) => {
         if(err){done(err)}
-          assert.equal(res.statusCode, 404)
+        assert.equal(res.statusCode, 404)
         done()
       })
     })
@@ -66,7 +66,7 @@ describe('Server', () => {
         assert.equal(foodList.length, 1)
         assert.include(foodList, "pineapple") 
         assert.include(foodList, "300") 
-        done()
+        setTimeout(done, 15000);
       })
     })
   })
