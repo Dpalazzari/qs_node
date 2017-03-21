@@ -14,6 +14,32 @@ app.get('/', (req, res) => {
   res.send(app.locals.title)
 })
 
+app.get("/api/foods", (req, res) => {
+  const foodList = app.locals.foodList
+  res.status(200).json({
+    foodList
+  })
+})
+
+app.get("/api/foods/:name", (req, res) => {
+  var food;
+  const name = req.params.name
+  const foodList = app.locals.foodList
+  for(var i = 0; i < foodList.length; i++){
+    if(foodList[i].name === name){
+      food = foodList[i];
+    }
+  }
+  if (!food){
+    return res.status(404).send({
+      error: "Food does not exist"
+    })
+  }
+  res.status(200).json({
+    food
+  })
+})
+
 app.delete("/api/foods/:name", (req, res) => {
   const name = req.params.name
   if (!name){

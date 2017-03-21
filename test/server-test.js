@@ -86,4 +86,43 @@ describe('Server', () => {
       })
     })
   })
+
+  describe("GET /api/foods/:name", () => {
+    beforeEach(() => {
+      app.locals.foodList = [{name: "David", calories: "300"}, 
+                              {name: "Drew", calories: "400"}]
+    })
+    it ("returns a 404 status if food name is missing", (done) => {
+      this.request.get("/api/foods/babooshka", (err, res) => {
+        if(err){done(err)}
+        assert.equal(res.statusCode, 404)
+        done()
+      })
+    })
+    it ("returns a food given its name", (done) => {
+      this.request.get("/api/foods/Drew", (err, res) => {
+        var foodJSON = {name: "Drew", calories: "400"}
+        if(err){done(err)}
+        assert.include(res.body, JSON.stringify(foodJSON))
+        done()
+      })
+    })
+  })
+
+  describe("GET /api/foods", () => {
+    beforeEach(() => {
+      app.locals.foodList = [{name:"David", calories: "10"},
+                              {name:"Drew", calories: "11"},
+                              {name:"Daniel", calories: "1100"}]
+    })
+    it("returns json of all foods in foodList", (done) => {
+      this.request.get("/api/foods", (err, res) => {
+        if(err){done(err)}
+        assert.include(res.body, "Drew")
+        assert.include(res.body, "Daniel")
+        assert.include(res.body, "David")
+        done()
+      })
+    })
+  })
 })
