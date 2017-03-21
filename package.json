@@ -1,0 +1,21 @@
+{
+  "name": "qs_node",
+  "version": "1.0.0",
+  "description": "backend quantified self",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Drew and David and Dan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "pryjs": "^1.0.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "request": "^2.81.0"
+  }
+}
