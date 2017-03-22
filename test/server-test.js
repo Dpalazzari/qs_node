@@ -1,6 +1,9 @@
 const assert = require('chai').assert
 const app = require('../server')
 const request = require('request')
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('../knexfile')[environment];
+const database = require('knex')(configuration);
 
 describe('Server', () => {
   before(done => {
@@ -16,6 +19,43 @@ describe('Server', () => {
 
   after(() => {
     this.server.close()
+  })
+
+  beforeEach((done) => {
+    database.raw(
+      `INSERT INTO foods (name, calories, created_at) VALUES (?, ?, ?)`,
+      ["cow", "100", new Date]
+    ).then(() => done())
+    .catch(done);
+  })
+  afterEach((done) => {
+    database.raw(`TRUNCATE foods RESTART IDENTITY`)
+    .then(() => done());
+  })
+  describe("GET /api/foods/:name", () => {
+    it ("returns a 404 status if food name is missing", (done) => {
+      this.request.get("/api/foods/babooshka", (err, res) => {
+        if(err){done(err)}
+        assert.equal(res.statusCode, 404)
+        done()
+      })
+    })
+
+    it ("returns a food given its name", (done) => {
+      this.request.get("/api/foods/cow", (err, res) => {
+        if(err){done(err)}
+        const id = 1
+        const name = "cow"
+        const calories = "100"
+
+        let parsedFood = JSON.parse(res.body)
+        console.log (parsedFood);
+        assert.equal(parsedFood.id, id)
+        assert.equal(parsedFood.name, name)
+        assert.equal(parsedFood.calories, calories)
+        done()
+      })
+    })
   })
 
   it('should exist', () => {
@@ -87,27 +127,27 @@ describe('Server', () => {
     })
   })
 
-  describe("GET /api/foods/:name", () => {
-    beforeEach(() => {
-      app.locals.foodList = [{name: "David", calories: "300"}, 
-                              {name: "Drew", calories: "400"}]
-    })
-    it ("returns a 404 status if food name is missing", (done) => {
-      this.request.get("/api/foods/babooshka", (err, res) => {
-        if(err){done(err)}
-        assert.equal(res.statusCode, 404)
-        done()
-      })
-    })
-    it ("returns a food given its name", (done) => {
-      this.request.get("/api/foods/Drew", (err, res) => {
-        var foodJSON = {name: "Drew", calories: "400"}
-        if(err){done(err)}
-        assert.include(res.body, JSON.stringify(foodJSON))
-        done()
-      })
-    })
-  })
+  // describe("GET /api/foods/:name", () => {
+  //   beforeEach(() => {
+  //     app.locals.foodList = [{name: "David", calories: "300"}, 
+  //                             {name: "Drew", calories: "400"}]
+  //   })
+  //   it ("returns a 404 status if food name is missing", (done) => {
+  //     this.request.get("/api/foods/babooshka", (err, res) => {
+  //       if(err){done(err)}
+  //       assert.equal(res.statusCode, 404)
+  //       done()
+  //     })
+  //   })
+  //   it ("returns a food given its name", (done) => {
+  //     this.request.get("/api/foods/Drew", (err, res) => {
+  //       var foodJSON = {name: "Drew", calories: "400"}
+  //       if(err){done(err)}
+  //       assert.include(res.body, JSON.stringify(foodJSON))
+  //       done()
+  //     })
+  //   })
+  // })
 
   describe("GET /api/foods", () => {
     beforeEach(() => {
