@@ -18,12 +18,16 @@ app.get('/', (req, res) => {
 })
 
 app.get("/api/foods", (req, res) => {
-  const foodList = app.locals.foodList
-  res.status(200).json({
-    foodList
+  database.raw(`SELECT * FROM FOODS`)
+  .then((foods) => {
+    if(!foods.rowCount){
+      return res.status(404).send({
+      error: "Food does not exist"
+    })
+  }
+  res.status(200).json(foods.rows)
   })
 })
-
 
 app.get("/api/foods/:name", (req, res) => {
   const name = req.params.name
@@ -75,9 +79,10 @@ app.post('/api/foods', (req, res) => {
       error: 'Missing food property'
     })
   }
-  app.locals.foodList.push(food)
-  res.status(201).json({
-    food
+  database.raw(`INSERT INTO FOODS (NAME, CALORIES, CREATED_AT) VALUES (?, ?, ?)`, 
+  [food.name, food.calories, new Date])
+  .then(() => {
+    res.sendStatus(201)
   })
 })
 
@@ -92,6 +97,5 @@ function findFood(name, foodList){
     if(foodList[i].name === name){return i;}
   }
 }
-
 
 module.exports = app;
