@@ -22,14 +22,9 @@ app.get("/api/foods", (req, res) => {
 })
 
 app.get("/api/foods/:name", (req, res) => {
-  var food;
   const name = req.params.name
   const foodList = app.locals.foodList
-  for(var i = 0; i < foodList.length; i++){
-    if(foodList[i].name === name){
-      food = foodList[i];
-    }
-  }
+  const food = foodList[findFood(name, foodList)]
   if (!food){
     return res.status(404).send({
       error: "Food does not exist"
@@ -48,9 +43,7 @@ app.delete("/api/foods/:name", (req, res) => {
     })
   }
   const foodList = app.locals.foodList
-  for(var i = 0; i < foodList.length; i++){
-    if(foodList[i].name === name){foodList.splice(i, 1)}
-  }
+  foodList.splice(findFood(name, foodList), 1)
   res.status(201).json({
     message: "Successfully deleted!"
   })
@@ -65,11 +58,7 @@ app.put("/api/foods/edit/:name", (req, res) => {
     })
   }
   const foodList = app.locals.foodList
-  for(var i = 0; i < foodList.length ; i++){
-    if(foodList[i].name === name){
-      foodList[i] = food;
-    }
-  }
+  foodList[findFood(name, foodList)] = food
   res.status(201).json({
     food
   })
@@ -93,4 +82,12 @@ if(!module.parent){
     console.log(`${app.locals.title} is running on port ${app.get('port')}.`)
   })
 }
+
+function findFood(name, foodList){
+  for(var i = 0; i < foodList.length; i++){
+    if(foodList[i].name === name){return i;}
+  }
+}
+
+
 module.exports = app;
