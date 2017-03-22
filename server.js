@@ -72,28 +72,18 @@ app.put("/api/foods/edit/:name", (req, res) => {
   })
 })
 
-app.post('/api/foods', (req, res, next) => {
+app.post('/api/foods', (req, res) => {
   const food = req.body.food
   if(!food){
     return res.status(422).send({
       error: 'Missing food property'
     })
   }
-  res.setTimeout(120000, function(){
-    console.log("YOU SUCK")
-  })
   database.raw(`INSERT INTO FOODS (NAME, CALORIES, CREATED_AT) VALUES (?, ?, ?)`, 
   [food.name, food.calories, new Date])
   .then(() => {
-    
+    res.sendStatus(201)
   })
-  .then(() => {
-    return res.status(201)
-  })
-  .catch(function(error){
-    next(error)
-  })
-  console.log('Big balls')
 })
 
 if(!module.parent){
