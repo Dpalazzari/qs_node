@@ -2,6 +2,9 @@ var pry = require('pryjs')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('./knexfile')[environment];
+const database = require('knex')(configuration);
 
 app.set('port', process.env.PORT || 3000)
 app.locals.title = 'Quantified Self Backend'
@@ -21,17 +24,18 @@ app.get("/api/foods", (req, res) => {
   })
 })
 
+
 app.get("/api/foods/:name", (req, res) => {
   const name = req.params.name
-  const foodList = app.locals.foodList
-  const food = foodList[findFood(name, foodList)]
-  if (!food){
+  database.raw(`SELECT * FROM FOODS
+  WHERE name=?`, [name])
+  .then((food) => {
+  if (!food.rowCount){
     return res.status(404).send({
       error: "Food does not exist"
     })
   }
-  res.status(200).json({
-    food
+  res.status(200).json(food.rows[0])
   })
 })
 
