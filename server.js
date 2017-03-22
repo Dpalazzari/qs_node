@@ -50,10 +50,12 @@ app.delete("/api/foods/:name", (req, res) => {
       error: "Missing name of food to delete"
     })
   }
-  const foodList = app.locals.foodList
-  foodList.splice(findFood(name, foodList), 1)
-  res.status(201).json({
-    message: "Successfully deleted!"
+  database.raw(`DELETE FROM foods WHERE name = ?`, 
+  [name]
+  ).then(() => {
+    res.status(204).json({
+      message: "Successfully deleted!"
+    })
   })
 }) 
 

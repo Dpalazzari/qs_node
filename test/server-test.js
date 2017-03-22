@@ -135,17 +135,16 @@ describe('Server', () => {
   })
 
   describe("DELETE /api/foods/:name", () => {
-    beforeEach(() => {
-      app.locals.foodList = [{name: "David", calories: "300"}]
-    })
     it ("removes a given food", (done) => {
-      var foodList = app.locals.foodList
-      assert.equal(foodList.length, 1)
-      this.request.delete("/api/foods/David", (err, res) => {
+      this.request.delete("/api/foods/cow", (err, res) => {
         if(err){done(err)}
-        foodList = app.locals.foodList
-        assert.equal(foodList.length, 0)
-        done()
+        assert.equal(res.statusCode, 204)
+        database.raw(`SELECT * FROM FOODS`)
+        .then((foods) => {
+          console.log(foods.rows)
+          assert.equal(foods.rows.length, 1)
+          done()
+        })
       })
     })
   })
