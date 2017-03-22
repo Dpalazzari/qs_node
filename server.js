@@ -50,10 +50,12 @@ app.delete("/api/foods/:name", (req, res) => {
       error: "Missing name of food to delete"
     })
   }
-  const foodList = app.locals.foodList
-  foodList.splice(findFood(name, foodList), 1)
-  res.status(201).json({
-    message: "Successfully deleted!"
+  database.raw(`DELETE FROM foods WHERE name = ?`, 
+  [name]
+  ).then(() => {
+    res.status(204).json({
+      message: "Successfully deleted!"
+    })
   })
 }) 
 
@@ -65,10 +67,10 @@ app.put("/api/foods/edit/:name", (req, res) => {
       error: "Missing food attributes"
     })
   }
-  const foodList = app.locals.foodList
-  foodList[findFood(name, foodList)] = food
-  res.status(201).json({
-    food
+  database.raw(`UPDATE foods SET name = ?, calories = ? WHERE name = ?`, 
+  [food.name, food.calories, name]
+  ).then(() => {
+    res.sendStatus(201)
   })
 })
 
