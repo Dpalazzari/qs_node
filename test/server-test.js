@@ -24,17 +24,27 @@ describe('Server', () => {
   beforeEach((done) => {
     database.raw(
       `INSERT INTO foods (name, calories, created_at) VALUES (?, ?, ?)`,
+      ["babooshka", "1000", new Date]
+    ).then(() => done())
+    .catch(done);
+  })
+
+  beforeEach((done) => {
+    database.raw(
+      `INSERT INTO foods (name, calories, created_at) VALUES (?, ?, ?)`,
       ["cow", "100", new Date]
     ).then(() => done())
     .catch(done);
   })
+
   afterEach((done) => {
     database.raw(`TRUNCATE foods RESTART IDENTITY`)
     .then(() => done());
   })
+
   describe("GET /api/foods/:name", () => {
     it ("returns a 404 status if food name is missing", (done) => {
-      this.request.get("/api/foods/babooshka", (err, res) => {
+      this.request.get("/api/foods/cowturds", (err, res) => {
         if(err){done(err)}
         assert.equal(res.statusCode, 404)
         done()
@@ -42,14 +52,13 @@ describe('Server', () => {
     })
 
     it ("returns a food given its name", (done) => {
-      this.request.get("/api/foods/cow", (err, res) => {
+      this.request.get("/api/foods/babooshka", (err, res) => {
         if(err){done(err)}
         const id = 1
-        const name = "cow"
-        const calories = "100"
+        const name = "babooshka"
+        const calories = "1000"
 
         let parsedFood = JSON.parse(res.body)
-        console.log (parsedFood);
         assert.equal(parsedFood.id, id)
         assert.equal(parsedFood.name, name)
         assert.equal(parsedFood.calories, calories)
@@ -127,40 +136,20 @@ describe('Server', () => {
     })
   })
 
-  // describe("GET /api/foods/:name", () => {
-  //   beforeEach(() => {
-  //     app.locals.foodList = [{name: "David", calories: "300"}, 
-  //                             {name: "Drew", calories: "400"}]
-  //   })
-  //   it ("returns a 404 status if food name is missing", (done) => {
-  //     this.request.get("/api/foods/babooshka", (err, res) => {
-  //       if(err){done(err)}
-  //       assert.equal(res.statusCode, 404)
-  //       done()
-  //     })
-  //   })
-  //   it ("returns a food given its name", (done) => {
-  //     this.request.get("/api/foods/Drew", (err, res) => {
-  //       var foodJSON = {name: "Drew", calories: "400"}
-  //       if(err){done(err)}
-  //       assert.include(res.body, JSON.stringify(foodJSON))
-  //       done()
-  //     })
-  //   })
-  // })
-
   describe("GET /api/foods", () => {
-    beforeEach(() => {
-      app.locals.foodList = [{name:"David", calories: "10"},
-                              {name:"Drew", calories: "11"},
-                              {name:"Daniel", calories: "1100"}]
-    })
     it("returns json of all foods in foodList", (done) => {
       this.request.get("/api/foods", (err, res) => {
+        const idFirst  = 1
+        const idSecond = 2
+        const foodOne  = 'cow'
+        const foodTwo  = 'babooshka'
         if(err){done(err)}
-        assert.include(res.body, "Drew")
-        assert.include(res.body, "Daniel")
-        assert.include(res.body, "David")
+        var parsedFoods = JSON.parse(res.body)
+        assert.equal(parsedFoods[0].id, idFirst)
+        assert.equal(parsedFoods[1].id, idSecond)
+        assert.equal(parsedFoods[0].name, foodTwo)
+        assert.equal(parsedFoods[1].name, foodOne)
+        assert.equal(parsedFoods.length, 2)
         done()
       })
     })
