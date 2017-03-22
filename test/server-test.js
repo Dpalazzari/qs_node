@@ -101,9 +101,6 @@ describe('Server', () => {
   })
 
   describe("PUT /api/foods/edit/:name", () => {
-    beforeEach(() => {
-      app.locals.foodList = [{name: "Drew", calories: "1000000"}]
-    })
     it("returns a 404 given invalid attributes", (done) => {
       this.request.put("/api/foods/edit/:name", (err, res) => {
         if(err){done(err)}
@@ -114,13 +111,25 @@ describe('Server', () => {
 
     it("updates a specific foods attributes", (done) => {
       const food = {food: {name: 'pineapple', calories: '300'}}
-      this.request.put("/api/foods/edit/Drew", { form: food}, (err, res) => {
+      this.request.put("/api/foods/edit/babooshka", { form: food}, (err, res) => {
         if(err){done(err)}
-        const foodList = app.locals.foodList
-        assert.equal(foodList.length, 1)
-        assert.equal(foodList[0].name, "pineapple")
-        assert.equal(foodList[0].calories, "300")
-        done()
+        const name = "pineapple"
+        const calories = "300"
+        assert.equal(res.statusCode, 201)
+        database.raw(`SELECT * FROM foods WHERE name = ?`, 
+        [name]
+        ).then((foods) => {
+          var foodObject = foods.rows[0]
+          assert.equal(foodObject.name, 'pineapple')
+          assert.equal(foodObject.calories, "300")
+        }).then(() => {
+          database.raw(`SELECT * FROM foods WHERE name = ?`, 
+        ["babooshka"]
+        ).then((foods) => {
+          assert.equal(foods.rows[0], undefined)
+          done()
+        })
+        })
       })
     })
   })
