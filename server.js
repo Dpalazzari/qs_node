@@ -10,10 +10,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
 // Controllers 
-var readController    = require('./controllers/readController')
-var createController  = require('./controllers/createController')
-var updateController  = require('./controllers/updateController')
-var destroyController = require('./controllers/destroyController')
+var readController    = require('./lib/controllers/readController')
+var createController  = require('./lib/controllers/createController')
+var updateController  = require('./lib/controllers/updateController')
+var destroyController = require('./lib/controllers/destroyController')
 
 app.set('port', process.env.PORT || 3000)
 
