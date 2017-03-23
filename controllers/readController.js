@@ -4,13 +4,12 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.locals.title = 'Quantified Self Backend'
 
-  app.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send(app.locals.title)
 })
 
 app.get("/api/foods", (req, res) => {
-  Food.index()
-  .then((foods) => {
+  Food.index().then((foods) => {
     if(!foods.rowCount){
       return res.status(404).send({
       error: "Food does not exist"
@@ -31,4 +30,5 @@ app.get("/api/foods/:name", (req, res) => {
     res.status(200).json(food.rows[0])
   })
 })
+
 }

@@ -1,9 +1,9 @@
 module.exports = function(app, bodyParser, Food){
 
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
 
-  app.put("/api/foods/edit/:name", (req, res) => {
+app.put("/api/foods/edit/:name", (req, res) => {
   const food = req.body.food
   const name = req.params.name
   if (!food){
