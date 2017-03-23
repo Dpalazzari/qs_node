@@ -7,6 +7,7 @@ module.exports = function(app){
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
+app.locals.title = 'Quantified Self Backend'
 
   app.get('/', (req, res) => {
     res.send(app.locals.title)
