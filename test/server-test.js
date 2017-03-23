@@ -127,7 +127,6 @@ describe('Server', () => {
         if(err){done(err)}
         assert.equal(res.statusCode, 204)
         Food.index().then((foods) => {
-          console.log(foods.rows)
           assert.equal(foods.rows.length, 1)
           done()
         })
