@@ -4,10 +4,6 @@ const bodyParser = require('body-parser')
 const Food = require('./lib/models/food.js')
 
 app.set('port', process.env.PORT || 3000)
-app.locals.title = 'Quantified Self Backend'
-
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
 
 // Controllers 
 var readController    = require('./lib/controllers/readController')
