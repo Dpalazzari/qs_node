@@ -101,16 +101,15 @@ describe('Server', () => {
     })
 
     it("updates a specific foods attributes", (done) => {
-      const food = {food: {name: 'pineapple', calories: '300'}}
+      const food = {food: {attrName: "name", attr: 'pineapple'}}
       this.request.put("/api/foods/edit/babooshka", { form: food}, (err, res) => {
         if(err){done(err)}
         const name = "pineapple"
-        const calories = "300"
         assert.equal(res.statusCode, 201)
         Food.show(name).then((foods) => {
           var foodObject = foods.rows[0]
           assert.equal(foodObject.name, 'pineapple')
-          assert.equal(foodObject.calories, "300")
+          assert.equal(foodObject.calories, "1000")
         }).then(() => {
           Food.show("babooshka").then((foods) => {
           assert.equal(foods.rows[0], undefined)
