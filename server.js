@@ -2,9 +2,10 @@ var pry = require('pryjs')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('./knexfile')[environment];
-const database = require('knex')(configuration);
+// const environment = process.env.NODE_ENV || 'development';
+// const configuration = require('./knexfile')[environment];
+// const database = require('knex')(configuration);
+const Food = require('./lib/models/food.js')
 
 app.set('port', process.env.PORT || 3000)
 app.locals.title = 'Quantified Self Backend'
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
 })
 
 app.get("/api/foods", (req, res) => {
-  database.raw(`SELECT * FROM FOODS`)
+  Food.index()
   .then((foods) => {
     if(!foods.rowCount){
       return res.status(404).send({
@@ -31,15 +32,13 @@ app.get("/api/foods", (req, res) => {
 
 app.get("/api/foods/:name", (req, res) => {
   const name = req.params.name
-  database.raw(`SELECT * FROM FOODS
-  WHERE name=?`, [name])
-  .then((food) => {
-  if (!food.rowCount){
-    return res.status(404).send({
-      error: "Food does not exist"
-    })
-  }
-  res.status(200).json(food.rows[0])
+  Food.show(name).then((food) => {
+    if (!food.rowCount){
+      return res.status(404).send({
+        error: "Food does not exist"
+      })
+    }
+    res.status(200).json(food.rows[0])
   })
 })
 
@@ -50,9 +49,7 @@ app.delete("/api/foods/:name", (req, res) => {
       error: "Missing name of food to delete"
     })
   }
-  database.raw(`DELETE FROM foods WHERE name = ?`, 
-  [name]
-  ).then(() => {
+  Food.delete(name).then(() => {
     res.status(204).json({
       message: "Successfully deleted!"
     })
@@ -67,9 +64,7 @@ app.put("/api/foods/edit/:name", (req, res) => {
       error: "Missing food attributes"
     })
   }
-  database.raw(`UPDATE foods SET name = ?, calories = ? WHERE name = ?`, 
-  [food.name, food.calories, name]
-  ).then(() => {
+  Food.update(food, name).then(() => {
     res.sendStatus(201)
   })
 })
@@ -81,9 +76,7 @@ app.post('/api/foods', (req, res) => {
       error: 'Missing food property'
     })
   }
-  database.raw(`INSERT INTO FOODS (NAME, CALORIES, CREATED_AT) VALUES (?, ?, ?)`, 
-  [food.name, food.calories, new Date])
-  .then(() => {
+  Food.create(food).then(() => {
     res.sendStatus(201)
   })
 })

@@ -1,9 +1,7 @@
 const assert = require('chai').assert
 const app = require('../server')
 const request = require('request')
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('../knexfile')[environment];
-const database = require('knex')(configuration);
+const Food = require('../lib/models/food')
 
 describe('Server', () => {
   before(done => {
@@ -22,24 +20,17 @@ describe('Server', () => {
   })
 
   beforeEach((done) => {
-    database.raw(
-      `INSERT INTO foods (name, calories, created_at) VALUES (?, ?, ?)`,
-      ["babooshka", "1000", new Date]
-    ).then(() => done())
+    Food.create({name: "babooshka", calories: "1000"}).then(() => done())
     .catch(done);
   })
 
   beforeEach((done) => {
-    database.raw(
-      `INSERT INTO foods (name, calories, created_at) VALUES (?, ?, ?)`,
-      ["cow", "100", new Date]
-    ).then(() => done())
+    Food.create({name: "cow", calories: "100"}).then(() => done())
     .catch(done);
   })
 
   afterEach((done) => {
-    database.raw(`TRUNCATE foods RESTART IDENTITY`)
-    .then(() => done());
+    Food.destroyAll().then(() => done());
   })
 
   describe("GET /api/foods/:name", () => {
@@ -87,7 +78,7 @@ describe('Server', () => {
         const name = 'pineapple'
         const calories = '300'
         if(err){done(err)}
-        database.raw(`SELECT * FROM FOODS`)
+        Food.index()
         .then((foods) => {
           if(!foods){
             done(err)
@@ -116,16 +107,12 @@ describe('Server', () => {
         const name = "pineapple"
         const calories = "300"
         assert.equal(res.statusCode, 201)
-        database.raw(`SELECT * FROM foods WHERE name = ?`, 
-        [name]
-        ).then((foods) => {
+        Food.show(name).then((foods) => {
           var foodObject = foods.rows[0]
           assert.equal(foodObject.name, 'pineapple')
           assert.equal(foodObject.calories, "300")
         }).then(() => {
-          database.raw(`SELECT * FROM foods WHERE name = ?`, 
-        ["babooshka"]
-        ).then((foods) => {
+          Food.show("babooshka").then((foods) => {
           assert.equal(foods.rows[0], undefined)
           done()
         })
@@ -139,8 +126,7 @@ describe('Server', () => {
       this.request.delete("/api/foods/cow", (err, res) => {
         if(err){done(err)}
         assert.equal(res.statusCode, 204)
-        database.raw(`SELECT * FROM FOODS`)
-        .then((foods) => {
+        Food.index().then((foods) => {
           console.log(foods.rows)
           assert.equal(foods.rows.length, 1)
           done()
