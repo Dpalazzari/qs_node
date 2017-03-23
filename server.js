@@ -8,6 +8,8 @@ const database = require('knex')(configuration);
 // Controllers 
 var readController   = require('./controllers/readController')
 var createController = require('./controllers/createController')
+var updateController = require('./controllers/updateController')
+
 
 app.set('port', process.env.PORT || 3000)
 app.locals.title = 'Quantified Self Backend'
@@ -19,6 +21,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 // Fire off Controllers
 readController(app)
 createController(app)
+updateController(app)
 
 app.delete("/api/foods/:name", (req, res) => {
   const name = req.params.name
@@ -35,21 +38,6 @@ app.delete("/api/foods/:name", (req, res) => {
     })
   })
 }) 
-
-app.put("/api/foods/edit/:name", (req, res) => {
-  const food = req.body.food
-  const name = req.params.name
-  if (!food){
-    return res.status(404).send({
-      error: "Missing food attributes"
-    })
-  }
-  database.raw(`UPDATE foods SET name = ?, calories = ? WHERE name = ?`, 
-  [food.name, food.calories, name]
-  ).then(() => {
-    res.sendStatus(201)
-  })
-})
 
 if(!module.parent){
   app.listen(app.get("port"), () => { 
