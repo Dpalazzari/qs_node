@@ -1,7 +1,15 @@
-const express = require('express')
-const app = express()
+const express    = require('express')
+const cors       = require('cors')
+const app        = express()
 const bodyParser = require('body-parser')
-const Food = require('./lib/models/food.js')
+const Food       = require('./lib/models/food.js')
+
+var corsOptions = {
+  origin:'*',
+  optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 
 app.set('port', process.env.PORT || 3000)
 
